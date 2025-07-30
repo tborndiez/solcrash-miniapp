@@ -8,35 +8,64 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <h1>🎮 SolCrash</h1>
-  <p>Tap Start and Withdraw before it crashes!</p>
+  <h1>🚀 SolCrash</h1>
   <p><strong>💰 Your Tokens:</strong> <span id="tokenCount">0</span></p>
-  <button onclick="startGame()">Start Game</button>
-  <div id="result"></div>
+  <div id="gameArea">
+    <p id="multiplier">🚀 1.00x</p>
+    <button id="startBtn" onclick="startGame()">▶️ Start Game</button>
+    <button id="withdrawBtn" onclick="withdraw()" style="display:none;">💸 Withdraw</button>
+    <p id="result"></p>
+  </div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
     const TOKEN_KEY = 'solcrash_tokens';
-    let tokens = localStorage.getItem(TOKEN_KEY) || 0;
-    tokens = parseInt(tokens);
+    let tokens = parseInt(localStorage.getItem(TOKEN_KEY) || '0');
     document.getElementById('tokenCount').innerText = tokens;
 
+    let multiplier = 1.00;
+    let interval;
+    let crashPoint;
+    let gameActive = false;
+
     function startGame() {
-      const crashPoint = Math.random() * 5 + 1;
-      const userClickTime = Math.random() * crashPoint;
-      const success = userClickTime < crashPoint * 0.8;
+      multiplier = 1.00;
+      crashPoint = Math.random() * 3 + 1.5; // Crash at 1.5x to 4.5x
+      gameActive = true;
+      document.getElementById('result').innerText = '';
+      document.getElementById('withdrawBtn').style.display = 'inline-block';
+      document.getElementById('startBtn').disabled = true;
 
-      if (success) {
-        tokens += 5; // 🪙 Tambah 5 token kalau menang
-        localStorage.setItem(TOKEN_KEY, tokens);
-        document.getElementById('tokenCount').innerText = tokens;
-      }
+      interval = setInterval(() => {
+        multiplier += 0.05;
+        document.getElementById('multiplier').innerText = `🚀 ${multiplier.toFixed(2)}x`;
 
-      document.getElementById('result').innerText = success
-        ? '✅ You earned 5 tokens!'
-        : '💥 Crashed! You lost!';
+        if (multiplier >= crashPoint) {
+          clearInterval(interval);
+          gameActive = false;
+          document.getElementById('withdrawBtn').style.display = 'none';
+          document.getElementById('startBtn').disabled = false;
+          document.getElementById('result').innerText = '💥 Crashed! You lost!';
+        }
+      }, 100);
+    }
+
+    function withdraw() {
+      if (!gameActive) return;
+
+      clearInterval(interval);
+      gameActive = false;
+
+      const reward = Math.floor(multiplier * 5); // reward = multiplier x 5
+      tokens += reward;
+      localStorage.setItem(TOKEN_KEY, tokens);
+      document.getElementById('tokenCount').innerText = tokens;
+
+      document.getElementById('withdrawBtn').style.display = 'none';
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('result').innerText = `✅ Withdrawn at ${multiplier.toFixed(2)}x — You earned ${reward} tokens!`;
     }
   </script>
 </body>
