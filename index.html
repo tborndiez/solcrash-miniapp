@@ -1,0 +1,30 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SolCrash</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <h1>🎮 SolCrash</h1>
+  <p>Tap Start and Withdraw before it crashes!</p>
+  <button onclick="startGame()">Start Game</button>
+  <div id="result"></div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function startGame() {
+      const crashPoint = Math.random() * 5 + 1;
+      const userClickTime = Math.random() * crashPoint;
+
+      const success = userClickTime < crashPoint * 0.8;
+      document.getElementById('result').innerText =
+        success ? '✅ You earned tokens!' : '💥 Crashed!';
+    }
+  </script>
+</body>
+</html>
