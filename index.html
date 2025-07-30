@@ -10,6 +10,7 @@
 <body>
   <h1>🎮 SolCrash</h1>
   <p>Tap Start and Withdraw before it crashes!</p>
+  <p><strong>💰 Your Tokens:</strong> <span id="tokenCount">0</span></p>
   <button onclick="startGame()">Start Game</button>
   <div id="result"></div>
 
@@ -17,14 +18,25 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
+    const TOKEN_KEY = 'solcrash_tokens';
+    let tokens = localStorage.getItem(TOKEN_KEY) || 0;
+    tokens = parseInt(tokens);
+    document.getElementById('tokenCount').innerText = tokens;
+
     function startGame() {
       const crashPoint = Math.random() * 5 + 1;
       const userClickTime = Math.random() * crashPoint;
-
       const success = userClickTime < crashPoint * 0.8;
-      document.getElementById('result').innerText =
-        success ? '✅ You earned tokens!' : '💥 Crashed!';
+
+      if (success) {
+        tokens += 5; // 🪙 Tambah 5 token kalau menang
+        localStorage.setItem(TOKEN_KEY, tokens);
+        document.getElementById('tokenCount').innerText = tokens;
+      }
+
+      document.getElementById('result').innerText = success
+        ? '✅ You earned 5 tokens!'
+        : '💥 Crashed! You lost!';
     }
   </script>
 </body>
-</html>
